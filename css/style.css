@@ -170,7 +170,6 @@ footer {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 4%;
 }
 
 .cs-lock-phone {
@@ -193,7 +192,7 @@ footer {
   left: 50%;
   top: 42.3%;
   transform: translate(-50%, -50%);
-  width: 27%;
+  width: 42%;
   aspect-ratio: 380 / 540;
   object-fit: cover;
 }

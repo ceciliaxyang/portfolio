@@ -54,4 +54,26 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  // Smart Lock card: only start the video once the whole card is on screen.
+  var lockVideo = document.querySelector(".cs-lock-video");
+  var lockCard = lockVideo && lockVideo.closest(".cs-device--lock");
+
+  if (lockVideo && lockCard && "IntersectionObserver" in window) {
+    var lockObserver = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.intersectionRatio >= 0.99) {
+            lockVideo.play();
+          } else {
+            lockVideo.pause();
+          }
+        });
+      },
+      { threshold: [0, 0.25, 0.5, 0.75, 0.99, 1] }
+    );
+    lockObserver.observe(lockCard);
+  } else if (lockVideo) {
+    lockVideo.play();
+  }
 });
