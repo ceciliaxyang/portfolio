@@ -40,6 +40,8 @@ body {
 
 a { color: inherit; }
 
+h1, h2, h3, h4, p { text-wrap: balance; }
+
 .wrap {
   max-width: 1160px;
   margin: 0 auto;
@@ -163,81 +165,37 @@ footer {
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.18);
 }
 
-/* Card 2 — Smart Lock connect screen */
+/* Card 2 — Smart Lock connect screen (from Figma: Cecilia personal, node 2055:14659) */
 .cs-device--lock {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #f7f6f2;
-  padding: 7% 9% 6%;
-}
-
-.cs-lock-grabber {
-  width: 42px;
-  height: 5px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.12);
-  margin-bottom: 4%;
-}
-
-.cs-lock-close {
-  align-self: flex-start;
-  background: none;
-  border: none;
-  padding: 0;
-  margin-bottom: 8%;
-  cursor: default;
-  line-height: 0;
-}
-
-.cs-lock-pad {
-  width: 38%;
-  aspect-ratio: 1 / 1;
-  border-radius: 14%;
-  background: linear-gradient(160deg, #2e2e31, #131315);
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08), 0 20px 40px rgba(0, 0, 0, 0.22);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
-  gap: 8%;
-  margin: 4% 0 8%;
+  padding-bottom: 4%;
 }
 
-.cs-lock-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  row-gap: 9%;
-  column-gap: 15%;
+.cs-lock-phone {
+  position: relative;
+  width: 62%;
+  aspect-ratio: 1049 / 1662;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.16));
 }
 
-.cs-lock-grid span {
-  color: #ffffff;
-  font-size: clamp(16px, 2.6vw, 28px);
-  font-weight: 500;
-  text-align: center;
-}
-
-.cs-lock-heading {
-  margin: 0 0 auto;
-  font-size: clamp(20px, 3.6vw, 38px);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  color: #222222;
-  text-align: center;
-}
-
-.cs-lock-cta {
+.cs-lock-base {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  background: #222222;
-  color: #ffffff;
-  border: none;
-  border-radius: 10px;
-  padding: 5% 0;
-  font-size: clamp(14px, 1.8vw, 18px);
-  font-weight: 600;
-  cursor: default;
+  height: 100%;
+  display: block;
+}
+
+.cs-lock-video {
+  position: absolute;
+  left: 50%;
+  top: 42.3%;
+  transform: translate(-50%, -50%);
+  width: 27%;
+  aspect-ratio: 380 / 540;
+  object-fit: cover;
 }
 
 /* Mobile / reduced motion: stack normally, no pinning, no tilt */
