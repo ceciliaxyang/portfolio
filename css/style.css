@@ -1,0 +1,248 @@
+:root {
+  --bg: #ffffff;
+  --text: #000000;
+  --muted: #6b6b6b;
+  --button-bg: #222222;
+  --button-text: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0b0b;
+    --text: #f5f5f5;
+    --muted: #9a9a9a;
+    --button-bg: #f5f5f5;
+    --button-text: #0b0b0b;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b0b0b;
+  --text: #f5f5f5;
+  --muted: #9a9a9a;
+  --button-bg: #f5f5f5;
+  --button-text: #0b0b0b;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: inherit; }
+
+.wrap {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Hero */
+.hero {
+  padding: 190px 0 140px;
+  text-align: center;
+}
+
+.hero h1 {
+  margin: 0 auto;
+  max-width: 720px;
+  font-size: clamp(34px, 5.4vw, 60px);
+  font-weight: 500;
+  line-height: 1.13;
+  letter-spacing: -0.02em;
+  opacity: 0;
+  transform: translateY(22px);
+  animation: heroFadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+}
+
+@keyframes heroFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero h1 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Contact section */
+.contact {
+  padding: 120px 0 200px;
+  text-align: center;
+  background: var(--bg);
+}
+
+.contact h2 {
+  margin: 0 0 40px;
+  font-size: clamp(30px, 5vw, 60px);
+  font-weight: 500;
+  line-height: 1.13;
+  letter-spacing: -0.02em;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 24px;
+  background: var(--button-bg);
+  color: var(--button-text);
+  border-radius: 100px;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  line-height: 20px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:hover { opacity: 0.85; }
+.btn:focus-visible { outline: 2px solid var(--text); outline-offset: 3px; }
+.btn:active { transform: scale(0.98); }
+
+footer {
+  padding: 32px 0 48px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+@media (max-width: 640px) {
+  .hero { padding: 120px 0 90px; }
+  .contact { padding: 70px 0 120px; }
+}
+
+/* ============================================
+   Case study — sticky pinned card stack
+   All selectors below are prefixed "cs-" so they
+   never collide with the rest of the page's styles.
+   ============================================ */
+
+.cs-wrap {
+  background: transparent;
+  color: #000000;
+}
+
+.cs-section {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: visible;
+  background: transparent;
+}
+
+.cs-card.cs-scroll {
+  position: relative;
+}
+
+.cs-device {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0) rotate(0deg);
+  width: min(800px, 90vw, calc((100vh - 120px) * 800 / 956));
+  aspect-ratio: 800 / 956;
+  border-radius: 36px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.18);
+}
+
+/* Card 2 — Smart Lock connect screen */
+.cs-device--lock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #f7f6f2;
+  padding: 7% 9% 6%;
+}
+
+.cs-lock-grabber {
+  width: 42px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.12);
+  margin-bottom: 4%;
+}
+
+.cs-lock-close {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  padding: 0;
+  margin-bottom: 8%;
+  cursor: default;
+  line-height: 0;
+}
+
+.cs-lock-pad {
+  width: 38%;
+  aspect-ratio: 1 / 1;
+  border-radius: 14%;
+  background: linear-gradient(160deg, #2e2e31, #131315);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.08), 0 20px 40px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8%;
+  margin: 4% 0 8%;
+}
+
+.cs-lock-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  row-gap: 9%;
+  column-gap: 15%;
+}
+
+.cs-lock-grid span {
+  color: #ffffff;
+  font-size: clamp(16px, 2.6vw, 28px);
+  font-weight: 500;
+  text-align: center;
+}
+
+.cs-lock-heading {
+  margin: 0 0 auto;
+  font-size: clamp(20px, 3.6vw, 38px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: #222222;
+  text-align: center;
+}
+
+.cs-lock-cta {
+  width: 100%;
+  background: #222222;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  padding: 5% 0;
+  font-size: clamp(14px, 1.8vw, 18px);
+  font-weight: 600;
+  cursor: default;
+}
+
+/* Mobile / reduced motion: stack normally, no pinning, no tilt */
+@media (max-width: 900px) {
+  .cs-section { height: auto; min-height: 100vh; }
+  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(320px, 78vw); }
+  .cs-card { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
+}
