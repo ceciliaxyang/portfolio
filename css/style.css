@@ -201,6 +201,6 @@ footer {
 /* Mobile / reduced motion: stack normally, no pinning, no tilt */
 @media (max-width: 900px) {
   .cs-section { height: auto; min-height: 100vh; }
-  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(320px, 78vw); }
+  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(760px, 85vw); }
   .cs-card { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
 }
