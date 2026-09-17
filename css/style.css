@@ -194,6 +194,28 @@ footer {
   max-width: none;
 }
 
+/* Card 4 — Host actions: full-bleed grid/collage recording, no single
+   centered phone mockup, so it just covers the whole card like a background. */
+.cs-hostactions-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Card 5 — AirKey guest unlock instructions */
+.cs-device--airkey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-airkey-video {
+  height: 100%;
+  width: auto;
+  max-width: none;
+}
+
 /* Card 2 — Smart Lock connect screen (from Figma: Cecilia personal, node 2055:14659) */
 .cs-device--lock {
   display: flex;
