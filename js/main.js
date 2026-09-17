@@ -94,6 +94,12 @@ document.addEventListener("DOMContentLoaded", function () {
     var card = video.closest(".cs-device");
     if (!card) return;
 
+    // Per-video override via data-in-view-threshold, e.g. for a full-bleed
+    // background video where even a sliver on screen is enough to justify
+    // starting it, instead of waiting for the shared default.
+    var threshold = parseFloat(video.dataset.inViewThreshold);
+    if (isNaN(threshold)) threshold = IN_VIEW_THRESHOLD;
+
     if (!("IntersectionObserver" in window)) {
       video.play();
       return;
@@ -113,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var observer = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          isInView = entry.intersectionRatio >= IN_VIEW_THRESHOLD;
+          isInView = entry.intersectionRatio >= threshold;
           if (isInView) {
             video.play().catch(function () {});
           } else {
@@ -121,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         });
       },
-      { threshold: [0, 0.25, 0.5, 0.6, 0.75, 0.99, 1] }
+      { threshold: [0, 0.1, 0.15, 0.2, 0.25, 0.5, 0.6, 0.75, 0.99, 1] }
     );
     observer.observe(card);
   });
