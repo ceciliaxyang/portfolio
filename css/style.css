@@ -230,7 +230,7 @@ footer {
 
 .cs-tips-phone {
   position: relative;
-  width: 55%;
+  width: 49.5%;
   aspect-ratio: 1716 / 3536;
   filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.16));
 }
@@ -249,7 +249,13 @@ footer {
   top: 1.72%;
   width: 91.61%;
   height: 96.61%;
-  border-radius: 13.84%;
+  /* A single border-radius percentage resolves horizontal radius against
+     width and vertical radius against height independently, which on this
+     non-square box (~0.46 aspect) produced an elliptical corner instead of
+     the phone's true circular one. The two-value slash syntax lets us pick
+     a height-percentage that resolves to the same pixel radius as the
+     width-percentage, restoring a circular corner. */
+  border-radius: 13.84% / 6.37%;
   overflow: hidden;
 }
 
