@@ -30,6 +30,11 @@ document.addEventListener("DOMContentLoaded", function () {
           pin: true,
           pinSpacing: false,
           scrub: 1,
+          // A fast flick can outrun the scrub's ~1s smoothing lag, leaving
+          // earlier cards' pin/scale state visibly behind the actual scroll
+          // position. This snaps the lagging tween to its end value once it
+          // detects an abnormally fast scroll, instead of letting it drift.
+          fastScrollEnd: true,
         },
       });
 
@@ -49,6 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
               start: "top top",
               end: "top+=" + delta + " top",
               scrub: 1,
+              fastScrollEnd: true,
             },
           }
         );
@@ -65,6 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
               start: "top top",
               end: "top+=" + delta + " top",
               scrub: 1,
+              fastScrollEnd: true,
             },
           }
         );
@@ -238,11 +245,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
       var rect = trigger.getBoundingClientRect();
       panel.classList.remove("is-open");
+      // Lift the background blur the moment dismissal starts, rather than
+      // waiting for the shrink spring to finish — the blur's own transition
+      // then plays concurrently with the panel animation instead of after it.
+      document.body.classList.remove("contact-open");
 
       if (prefersReducedMotion) {
         panel.style.visibility = "hidden";
         revealTrigger();
-        document.body.classList.remove("contact-open");
         resetForm();
         return;
       }
@@ -264,7 +274,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
       controls.finished.then(function () {
         panel.style.visibility = "hidden";
-        document.body.classList.remove("contact-open");
         resetForm();
       });
     }

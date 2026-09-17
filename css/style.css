@@ -57,7 +57,9 @@ h1, h2, h3, h4, p { text-wrap: balance; }
 .hero h1 {
   margin: 0 auto;
   max-width: 720px;
-  font-size: 60px;
+  /* Fixed 60px down to 700px; below that it scales proportionally down to a
+     42px floor at a 320px viewport (linear interpolation via clamp()). */
+  font-size: clamp(42px, 4.737vw + 26.84px, 60px);
   font-weight: 500;
   line-height: 1.13;
   letter-spacing: -0.02em;
@@ -165,6 +167,7 @@ footer {
   overflow: hidden;
   background: #ffffff;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.18);
+  will-change: transform;
 }
 
 /* Card 1 — Today tab screen recording */
@@ -323,6 +326,19 @@ footer {
    flush with the bottom, hence rounded top corners and square bottom ones. */
 body.contact-open { overflow: hidden; }
 
+.wrap,
+.cs-wrap,
+footer {
+  transition: filter 0.4s ease;
+}
+
+body.contact-open > .wrap,
+body.contact-open > .cs-wrap,
+body.contact-open > footer {
+  filter: blur(20px);
+  pointer-events: none;
+}
+
 .contact-trigger { position: relative; transition: opacity 0.25s ease; }
 
 .contact-panel {
@@ -393,6 +409,7 @@ body.contact-open { overflow: hidden; }
 
 .contact-panel-inner h2 {
   margin: 0 0 12px;
+  padding-bottom: 40px;
   font-size: clamp(28px, 4vw, 40px);
   font-weight: 500;
   letter-spacing: -0.02em;
