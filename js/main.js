@@ -138,18 +138,41 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (trigger && panel && closeBtn) {
     var isOpen = false;
+    var TOP_GAP = 100;
+    var SHEET_RADIUS = 24;
+    var PILL_RADIUS = 100;
     var SPRING = { type: "spring", stiffness: 260, damping: 28, mass: 1 };
 
-    function fullScreenRect() {
-      return { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight, borderRadius: 0 };
+    // Position/size (top/left/width/height) is tweened by Motion for real
+    // spring physics. Corner radii are set as plain style writes instead and
+    // animated by the CSS transition on .contact-panel — Motion 11.18.2
+    // silently fails to animate border-top-left-radius / border-top-right-
+    // radius from a non-zero starting value (confirmed in isolation), which
+    // was the actual cause of the "square, then snaps round" artifact.
+    function sheetRect() {
+      return { top: TOP_GAP, left: 0, width: window.innerWidth, height: window.innerHeight - TOP_GAP };
     }
 
-    function setPanelRect(rect, radius) {
+    function setPanelRect(rect) {
       panel.style.top = rect.top + "px";
       panel.style.left = rect.left + "px";
       panel.style.width = rect.width + "px";
       panel.style.height = rect.height + "px";
-      panel.style.borderRadius = radius + "px";
+    }
+
+    function setPanelRadii(radii) {
+      panel.style.borderTopLeftRadius = radii.tl + "px";
+      panel.style.borderTopRightRadius = radii.tr + "px";
+      panel.style.borderBottomLeftRadius = radii.bl + "px";
+      panel.style.borderBottomRightRadius = radii.br + "px";
+    }
+
+    function pillRadii() {
+      return { tl: PILL_RADIUS, tr: PILL_RADIUS, bl: PILL_RADIUS, br: PILL_RADIUS };
+    }
+
+    function sheetRadii() {
+      return { tl: SHEET_RADIUS, tr: SHEET_RADIUS, bl: 0, br: 0 };
     }
 
     function openPanel() {
@@ -160,25 +183,27 @@ document.addEventListener("DOMContentLoaded", function () {
       document.body.classList.add("contact-open");
 
       if (prefersReducedMotion) {
-        var full = fullScreenRect();
-        setPanelRect(full, full.borderRadius);
+        setPanelRect(sheetRect());
+        setPanelRadii(sheetRadii());
         panel.style.visibility = "visible";
         panel.classList.add("is-open");
         trigger.style.visibility = "hidden";
         return;
       }
 
-      // Start the panel exactly over the button, then spring it to full-screen.
-      setPanelRect(rect, 999);
+      // Start the panel exactly over the button, then spring it to the sheet.
+      setPanelRect(rect);
+      setPanelRadii(pillRadii());
       panel.style.visibility = "visible";
       trigger.style.visibility = "hidden";
       panel.classList.add("is-open");
 
-      animate(
-        panel,
-        { top: 0, left: 0, width: window.innerWidth, height: window.innerHeight, borderRadius: 0 },
-        SPRING
-      );
+      requestAnimationFrame(function () {
+        panel.getBoundingClientRect(); // commit the start frame above first
+        var target = sheetRect();
+        setPanelRadii(sheetRadii()); // CSS transition takes it from here
+        animate(panel, { top: target.top, left: target.left, width: target.width, height: target.height }, SPRING);
+      });
     }
 
     function closePanel() {
@@ -195,9 +220,10 @@ document.addEventListener("DOMContentLoaded", function () {
         return;
       }
 
+      setPanelRadii(pillRadii()); // CSS transition takes it from here
       var controls = animate(
         panel,
-        { top: rect.top, left: rect.left, width: rect.width, height: rect.height, borderRadius: 999 },
+        { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
         SPRING
       );
 
@@ -216,10 +242,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     window.addEventListener("resize", function () {
-      if (isOpen) {
-        var full = fullScreenRect();
-        setPanelRect(full, full.borderRadius);
-      }
+      if (isOpen) setPanelRect(sheetRect());
     });
 
     if (form) {

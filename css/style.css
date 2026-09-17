@@ -258,18 +258,26 @@ footer {
 }
 
 /* Contact "expandable screen": the trigger button morphs into a full-page
-   panel. Geometry (top/left/width/height/border-radius) is animated via
-   inline styles set from JS (a FLIP-style rect tween), not by this CSS —
-   these rules just declare which properties are animatable and the panel's
-   at-rest appearance once JS has taken over. */
+   panel. Geometry (top/left/width/height and the four corner radii) is
+   animated via inline styles set from JS (a FLIP-style rect tween), not by
+   this CSS — these rules just declare the panel's at-rest appearance
+   before JS takes over on open. When open, the panel stops 100px short of
+   the viewport's top edge (so the page peeks through above it) but stays
+   flush with the bottom, hence rounded top corners and square bottom ones. */
 body.contact-open { overflow: hidden; }
 
 .contact-trigger { position: relative; }
 
 .contact-panel {
-  /* top/left/width/height/border-radius are tweened directly by Motion
-     (js/main.js), not by a CSS transition — Motion's spring gives a more
-     natural morph than a fixed-duration easing curve would. */
+  /* top/left/width/height are tweened directly by Motion (js/main.js) for
+     real spring physics. The four border-*-radius longhands are handled by
+     this CSS transition instead — Motion 11.18.2 has a bug where animating
+     border-top-left-radius / border-top-right-radius from a non-zero
+     starting value silently no-ops (confirmed in isolation; unrelated to
+     any other property in the same call), which is what caused the old
+     "jumps to a rectangle, then snaps round" artifact on close. A native
+     CSS transition doesn't have that bug and, with a back-out easing
+     curve, reads as spring-like anyway. */
   position: fixed;
   top: 0;
   left: 0;
@@ -279,6 +287,10 @@ body.contact-open { overflow: hidden; }
   overflow-y: auto;
   background: #171717;
   color: #ffffff;
+  transition: border-top-left-radius 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-top-right-radius 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-bottom-left-radius 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-bottom-right-radius 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
   visibility: hidden;
 }
 
