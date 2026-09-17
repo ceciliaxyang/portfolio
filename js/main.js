@@ -35,6 +35,14 @@ document.addEventListener("DOMContentLoaded", function () {
           // position. This snaps the lagging tween to its end value once it
           // detects an abnormally fast scroll, instead of letting it drift.
           fastScrollEnd: true,
+          // A big enough scroll jump (a fast trackpad flick) can skip past
+          // the point where GSAP would normally clear the pin's transform
+          // on unpin, leaving the card stuck translated into view instead
+          // of back at its natural (offscreen) position. Clearing it
+          // explicitly once the pin is done makes sure it's really gone.
+          onLeave: function () {
+            gsap.set(section, { clearProps: "transform" });
+          },
         },
       });
 

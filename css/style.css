@@ -92,7 +92,9 @@ h1, h2, h3, h4, p { text-wrap: balance; }
 
 .contact h2 {
   margin: 0 0 40px;
-  font-size: clamp(30px, 5vw, 60px);
+  /* Same fixed-then-shrink curve as the hero h1: 60px down to 700px, then
+     scales proportionally down to a 42px floor at a 320px viewport. */
+  font-size: clamp(42px, 4.737vw + 26.84px, 60px);
   font-weight: 500;
   line-height: 1.13;
   letter-spacing: -0.02em;
@@ -410,7 +412,10 @@ body.contact-open > footer {
 .contact-panel-inner h2 {
   margin: 0 0 12px;
   padding-bottom: 40px;
-  font-size: clamp(28px, 4vw, 40px);
+  /* Same fixed-then-shrink curve as the hero h1, scaled to this heading's
+     own 40px max: fixed down to 700px, then scales proportionally down to
+     a 28px floor at a 320px viewport (keeps the same 0.7 floor/max ratio). */
+  font-size: clamp(28px, 3.158vw + 17.89px, 40px);
   font-weight: 500;
   letter-spacing: -0.02em;
 }
