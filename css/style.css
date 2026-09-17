@@ -178,6 +178,22 @@ footer {
   max-width: none;
 }
 
+/* Card 3 — Setup flow screen recording */
+.cs-device--setup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-setup-video {
+  /* This recording's phone mockup sits small within a much wider frame
+     (unlike the other card videos), so scale up beyond 100% to bring the
+     phone itself to a comparable size instead of filling by frame height. */
+  width: 250%;
+  height: auto;
+  max-width: none;
+}
+
 /* Card 2 — Smart Lock connect screen (from Figma: Cecilia personal, node 2055:14659) */
 .cs-device--lock {
   display: flex;

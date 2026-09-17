@@ -97,11 +97,23 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
 
+    var isInView = false;
+
+    // A play() call can silently fail (rejected promise) if it fires before
+    // the video has buffered enough data — especially for large 4K sources.
+    // IntersectionObserver only calls back on threshold *changes*, so if that
+    // one attempt fails, nothing else retries it. Retry once the video signals
+    // it's actually ready to play, as long as the card is still in view.
+    video.addEventListener("canplay", function () {
+      if (isInView) video.play().catch(function () {});
+    });
+
     var observer = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          if (entry.intersectionRatio >= IN_VIEW_THRESHOLD) {
-            video.play();
+          isInView = entry.intersectionRatio >= IN_VIEW_THRESHOLD;
+          if (isInView) {
+            video.play().catch(function () {});
           } else {
             video.pause();
           }
