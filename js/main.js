@@ -51,13 +51,12 @@ document.addEventListener("DOMContentLoaded", function () {
           }
         );
       } else {
-        // Mobile: a gentler fade + scale, no rotation — less jarring on touch scroll.
+        // Mobile: a gentler scale only, no rotation and no fade — cards stay fully opaque.
         gsap.fromTo(
           device,
-          { scale: 1, opacity: 1 },
+          { scale: 1 },
           {
             scale: 0.88,
-            opacity: 0.35,
             ease: "none",
             scrollTrigger: {
               trigger: section,
