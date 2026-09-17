@@ -218,6 +218,57 @@ footer {
   max-width: none;
 }
 
+/* Card 6 — Tips enter/exit thumbnail view (from Figma: Cecilia personal,
+   node 2055:17857). A phone-frame photo with the recording clipped into the
+   screen area, plus a static "global nav" export layered on top at the
+   bottom to cover the (incorrect) nav bar baked into the recording itself. */
+.cs-device--tips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-tips-phone {
+  position: relative;
+  width: 55%;
+  aspect-ratio: 1716 / 3536;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.16));
+}
+
+.cs-tips-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cs-tips-screen {
+  position: absolute;
+  left: 4.03%;
+  top: 1.72%;
+  width: 91.61%;
+  height: 96.61%;
+  border-radius: 13.84%;
+  overflow: hidden;
+}
+
+.cs-tips-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cs-tips-nav {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
 /* Card 2 — Smart Lock connect screen (from Figma: Cecilia personal, node 2055:14659) */
 .cs-device--lock {
   display: flex;
