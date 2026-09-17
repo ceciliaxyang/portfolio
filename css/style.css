@@ -266,7 +266,7 @@ footer {
    flush with the bottom, hence rounded top corners and square bottom ones. */
 body.contact-open { overflow: hidden; }
 
-.contact-trigger { position: relative; }
+.contact-trigger { position: relative; transition: opacity 0.25s ease; }
 
 .contact-panel {
   /* top/left/width/height are tweened directly by Motion (js/main.js) for
@@ -341,9 +341,11 @@ body.contact-open { overflow: hidden; }
   letter-spacing: -0.02em;
 }
 
-.contact-panel-inner p {
-  margin: 0 0 32px;
-  color: #a3a3a3;
+.contact-form-success {
+  margin: 0;
+  padding: 16px 0 0;
+  color: #ffffff;
+  font-size: 16px;
   line-height: 1.5;
 }
 

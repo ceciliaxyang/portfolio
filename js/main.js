@@ -135,10 +135,11 @@ document.addEventListener("DOMContentLoaded", function () {
   var panel = document.getElementById("contactPanel");
   var closeBtn = document.getElementById("contactPanelClose");
   var form = document.getElementById("contactForm");
+  var successMessage = document.getElementById("contactFormSuccess");
 
   if (trigger && panel && closeBtn) {
     var isOpen = false;
-    var TOP_GAP = 100;
+    var TOP_GAP = 60;
     var SHEET_RADIUS = 24;
     var PILL_RADIUS = 100;
     var SPRING = { type: "spring", stiffness: 260, damping: 28, mass: 1 };
@@ -187,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
         setPanelRadii(sheetRadii());
         panel.style.visibility = "visible";
         panel.classList.add("is-open");
-        trigger.style.visibility = "hidden";
+        hideTrigger();
         return;
       }
 
@@ -195,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
       setPanelRect(rect);
       setPanelRadii(pillRadii());
       panel.style.visibility = "visible";
-      trigger.style.visibility = "hidden";
+      hideTrigger();
       panel.classList.add("is-open");
 
       requestAnimationFrame(function () {
@@ -204,6 +205,25 @@ document.addEventListener("DOMContentLoaded", function () {
         setPanelRadii(sheetRadii()); // CSS transition takes it from here
         animate(panel, { top: target.top, left: target.left, width: target.width, height: target.height }, SPRING);
       });
+    }
+
+    function hideTrigger() {
+      trigger.style.visibility = "hidden";
+      trigger.style.opacity = "0";
+    }
+
+    function revealTrigger() {
+      trigger.style.visibility = "visible";
+      requestAnimationFrame(function () {
+        trigger.style.opacity = "1";
+      });
+    }
+
+    function resetForm() {
+      if (!form) return;
+      form.hidden = false;
+      form.reset();
+      if (successMessage) successMessage.hidden = true;
     }
 
     function closePanel() {
@@ -215,8 +235,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (prefersReducedMotion) {
         panel.style.visibility = "hidden";
-        trigger.style.visibility = "visible";
+        revealTrigger();
         document.body.classList.remove("contact-open");
+        resetForm();
         return;
       }
 
@@ -227,10 +248,18 @@ document.addEventListener("DOMContentLoaded", function () {
         SPRING
       );
 
+      // Bring the button's own label back well before the spring's tail has
+      // fully settled — by ~300ms the panel is already visually on top of
+      // the button's position, so revealing it here (instead of waiting on
+      // controls.finished) removes the "blank pill" lag without any visual
+      // seam, since the panel still covers the button until it's shrunk all
+      // the way down.
+      window.setTimeout(revealTrigger, 300);
+
       controls.finished.then(function () {
         panel.style.visibility = "hidden";
-        trigger.style.visibility = "visible";
         document.body.classList.remove("contact-open");
+        resetForm();
       });
     }
 
@@ -248,16 +277,11 @@ document.addEventListener("DOMContentLoaded", function () {
     if (form) {
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        var data = new FormData(form);
-        var name = data.get("name") || "";
-        var email = data.get("email") || "";
-        var message = data.get("message") || "";
-        var body = "From: " + name + " (" + email + ")\n\n" + message;
-        window.location.href =
-          "mailto:hello@example.com?subject=" +
-          encodeURIComponent("Portfolio contact") +
-          "&body=" +
-          encodeURIComponent(body);
+        // No backend yet — just confirm receipt and auto-dismiss. Wiring up
+        // where this actually gets sent is a later step.
+        form.hidden = true;
+        if (successMessage) successMessage.hidden = false;
+        window.setTimeout(closePanel, 1500);
       });
     }
   }

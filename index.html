@@ -69,9 +69,8 @@
         <path d="M1.5 1.5L16.5 16.5M16.5 1.5L1.5 16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
       </svg>
     </button>
-    <div class="contact-panel-inner">
+    <div class="contact-panel-inner" id="contactPanelInner">
       <h2>Get in touch</h2>
-      <p>Tell me a bit about what you're working on — I'll get back to you shortly.</p>
       <form class="contact-form" id="contactForm">
         <label>Name
           <input type="text" name="name" autocomplete="name" required>
@@ -84,6 +83,7 @@
         </label>
         <button type="submit" class="btn contact-form-submit">Send</button>
       </form>
+      <p class="contact-form-success" id="contactFormSuccess" hidden>Thanks — I'll get back to you soon.</p>
     </div>
   </div>
 
