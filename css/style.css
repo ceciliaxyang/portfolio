@@ -226,7 +226,7 @@ footer {
 .cs-lock-phone {
   position: relative;
   width: 62%;
-  aspect-ratio: 1049 / 1662;
+  aspect-ratio: 1049 / 1610;
   filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.16));
 }
 
@@ -241,7 +241,7 @@ footer {
 .cs-lock-video {
   position: absolute;
   left: 50%;
-  top: 42.3%;
+  top: 43.7%;
   transform: translate(-50%, -50%);
   width: 42%;
   aspect-ratio: 380 / 540;
