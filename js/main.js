@@ -5,10 +5,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var mm = gsap.matchMedia();
 
-  // Desktop / motion-ok: pinned stack, each card shrinking + tilting as the next covers it.
-  mm.add("(min-width: 901px)", function () {
-    if (prefersReducedMotion) return;
-
+  function setupPinnedStack(useTilt) {
     var releaseEl = document.querySelector(".contact");
     var lastCard = document.querySelector(".cs-card.cs-scroll");
     var pinnedSections = gsap.utils.toArray(".cs-pinned");
@@ -22,7 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
       var device = section.querySelector(".cs-device");
       var nextSection = sections[index + 1] || lastCard;
       var delta = nextSection.offsetTop - section.offsetTop;
-      var tilt = tiltAngles[index % tiltAngles.length];
 
       gsap.to(section, {
         scrollTrigger: {
@@ -35,7 +31,10 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       });
 
-      if (device) {
+      if (!device) return;
+
+      if (useTilt) {
+        var tilt = tiltAngles[index % tiltAngles.length];
         gsap.fromTo(
           device,
           { scale: 1, rotate: 0 },
@@ -51,29 +50,66 @@ document.addEventListener("DOMContentLoaded", function () {
             },
           }
         );
+      } else {
+        // Mobile: a gentler fade + scale, no rotation — less jarring on touch scroll.
+        gsap.fromTo(
+          device,
+          { scale: 1, opacity: 1 },
+          {
+            scale: 0.88,
+            opacity: 0.35,
+            ease: "none",
+            scrollTrigger: {
+              trigger: section,
+              start: "top top",
+              end: "top+=" + delta + " top",
+              scrub: 1,
+            },
+          }
+        );
       }
     });
+  }
+
+  // Desktop / motion-ok: pinned stack, each card shrinking + tilting as the next covers it.
+  mm.add("(min-width: 901px)", function () {
+    if (prefersReducedMotion) return;
+    setupPinnedStack(true);
   });
 
-  // Smart Lock card: only start the video once the whole card is on screen.
-  var lockVideo = document.querySelector(".cs-lock-video");
-  var lockCard = lockVideo && lockVideo.closest(".cs-device--lock");
+  // Mobile / motion-ok: same pinned stack, gentler fade + scale instead of tilt.
+  mm.add("(max-width: 900px)", function () {
+    if (prefersReducedMotion) return;
+    setupPinnedStack(false);
+  });
 
-  if (lockVideo && lockCard && "IntersectionObserver" in window) {
-    var lockObserver = new IntersectionObserver(
+  // Card videos: only start playing once the card is substantially on screen.
+  // (Cards can be taller than the viewport on shorter screens, so we don't
+  // require 100% visibility — that could be impossible to satisfy.)
+  var cardVideos = document.querySelectorAll(".cs-device video");
+  var IN_VIEW_THRESHOLD = 0.6;
+
+  cardVideos.forEach(function (video) {
+    var card = video.closest(".cs-device");
+    if (!card) return;
+
+    if (!("IntersectionObserver" in window)) {
+      video.play();
+      return;
+    }
+
+    var observer = new IntersectionObserver(
       function (entries) {
         entries.forEach(function (entry) {
-          if (entry.intersectionRatio >= 0.99) {
-            lockVideo.play();
+          if (entry.intersectionRatio >= IN_VIEW_THRESHOLD) {
+            video.play();
           } else {
-            lockVideo.pause();
+            video.pause();
           }
         });
       },
-      { threshold: [0, 0.25, 0.5, 0.75, 0.99, 1] }
+      { threshold: [0, 0.25, 0.5, 0.6, 0.75, 0.99, 1] }
     );
-    lockObserver.observe(lockCard);
-  } else if (lockVideo) {
-    lockVideo.play();
-  }
+    observer.observe(card);
+  });
 });
