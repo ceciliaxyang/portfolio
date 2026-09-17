@@ -57,7 +57,7 @@ h1, h2, h3, h4, p { text-wrap: balance; }
 .hero h1 {
   margin: 0 auto;
   max-width: 720px;
-  font-size: clamp(48px, 5.4vw, 60px);
+  font-size: 60px;
   font-weight: 500;
   line-height: 1.13;
   letter-spacing: -0.02em;
@@ -157,8 +157,8 @@ footer {
   top: 50%;
   left: 50%;
   transform: translate3d(-50%, -50%, 0) rotate(0deg);
-  width: min(1000px, 90vw, calc((100vh - 120px) * 1000 / 956));
-  aspect-ratio: 800 / 956;
+  width: min(900px, 90vw, calc(100vh - 120px));
+  aspect-ratio: 1 / 1;
   border-radius: 36px;
   overflow: hidden;
   background: #ffffff;
@@ -213,6 +213,6 @@ footer {
 /* Mobile / reduced motion: stack normally, no pinning, no tilt */
 @media (max-width: 900px) {
   .cs-section { height: auto; min-height: 100vh; }
-  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(960px, 85vw); }
+  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(900px, 85vw); }
   .cs-card { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
 }
