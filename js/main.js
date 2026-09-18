@@ -1,5 +1,20 @@
 import { animate } from "https://esm.sh/motion@11";
 
+// GitHub Pages (and this project's local "serve" setup) have no server-side
+// routing, so a direct hit to /contact has no matching file and falls
+// through to 404.html, which stashes the intended path and bounces to "/".
+// Restore it here, before anything else runs, so the /contact check further
+// down sees the real path the visitor asked for.
+(function () {
+  var redirectPath = window.sessionStorage.getItem("redirectPath");
+  if (redirectPath) {
+    window.sessionStorage.removeItem("redirectPath");
+    if (redirectPath === "/contact" && window.history.replaceState) {
+      window.history.replaceState(null, "", "/contact");
+    }
+  }
+})();
+
 document.addEventListener("DOMContentLoaded", function () {
   if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") return;
   gsap.registerPlugin(ScrollTrigger);
@@ -115,12 +130,34 @@ document.addEventListener("DOMContentLoaded", function () {
     var threshold = parseFloat(video.dataset.inViewThreshold);
     if (isNaN(threshold)) threshold = IN_VIEW_THRESHOLD;
 
+    // Per-video override via data-play-delay (ms): a beat of stillness
+    // before playback actually starts, instead of firing the instant the
+    // card crosses its threshold.
+    var playDelay = parseInt(video.dataset.playDelay, 10);
+    if (isNaN(playDelay)) playDelay = 0;
+
     if (!("IntersectionObserver" in window)) {
       video.play();
       return;
     }
 
     var isInView = false;
+    var pendingPlayTimer = null;
+
+    function cancelScheduledPlay() {
+      if (pendingPlayTimer) {
+        window.clearTimeout(pendingPlayTimer);
+        pendingPlayTimer = null;
+      }
+    }
+
+    function schedulePlay() {
+      if (pendingPlayTimer) return;
+      pendingPlayTimer = window.setTimeout(function () {
+        pendingPlayTimer = null;
+        if (isInView) video.play().catch(function () {});
+      }, playDelay);
+    }
 
     // A play() call can silently fail (rejected promise) if it fires before
     // the video has buffered enough data — especially for large 4K sources.
@@ -128,7 +165,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // one attempt fails, nothing else retries it. Retry once the video signals
     // it's actually ready to play, as long as the card is still in view.
     video.addEventListener("canplay", function () {
-      if (isInView) video.play().catch(function () {});
+      if (isInView) schedulePlay();
     });
 
     var observer = new IntersectionObserver(
@@ -136,8 +173,9 @@ document.addEventListener("DOMContentLoaded", function () {
         entries.forEach(function (entry) {
           isInView = entry.intersectionRatio >= threshold;
           if (isInView) {
-            video.play().catch(function () {});
+            schedulePlay();
           } else {
+            cancelScheduledPlay();
             video.pause();
           }
         });
@@ -157,12 +195,77 @@ document.addEventListener("DOMContentLoaded", function () {
   var closeBtn = document.getElementById("contactPanelClose");
   var form = document.getElementById("contactForm");
   var successMessage = document.getElementById("contactFormSuccess");
+  var submitError = document.getElementById("contactFormError");
+  var messageField = document.getElementById("contactMessage");
+
+  // Message field grows with its content instead of scrolling internally,
+  // so the send button gets pushed down once typed text wraps past the
+  // field's CSS min-height (see .contact-form textarea) — that min-height,
+  // not this function, is what holds the resting position, so this only
+  // ever needs to run in response to actual typing, never on open/close.
+  function autoGrowMessage() {
+    if (!messageField) return;
+    messageField.style.height = "auto";
+    messageField.style.height = messageField.scrollHeight + "px";
+  }
+
+  // Inline field errors (instead of the browser's native validation bubble),
+  // shown below each field's underline — only on submit, never just from
+  // typing or tabbing through, and cleared again as soon as the user edits
+  // the field.
+  var errorFields = [
+    { input: document.getElementById("contactName"), error: document.getElementById("contactNameError") },
+    { input: document.getElementById("contactEmail"), error: document.getElementById("contactEmailError") },
+    { input: document.getElementById("contactMessage"), error: document.getElementById("contactMessageError") },
+  ];
+
+  function messageForError(input) {
+    if (input.validity.valueMissing) return "Please fill out this field.";
+    if (input.validity.typeMismatch) return "Please enter a valid email.";
+    return "";
+  }
+
+  function hideFieldError(field) {
+    field.error.hidden = true;
+  }
+
+  function showFieldError(field) {
+    field.error.textContent = messageForError(field.input);
+    field.error.hidden = false;
+  }
+
+  function clearAllErrors() {
+    errorFields.forEach(hideFieldError);
+  }
+
+  function isAtMaxLength(input) {
+    return input.maxLength > -1 && input.value.length >= input.maxLength;
+  }
+
+  errorFields.forEach(function (field) {
+    field.input.addEventListener("input", function () {
+      if (isAtMaxLength(field.input)) {
+        field.error.textContent = "You've reached the " + field.input.maxLength + " character limit.";
+        field.error.hidden = false;
+        return;
+      }
+      hideFieldError(field);
+    });
+  });
+
+  if (messageField) {
+    messageField.addEventListener("input", autoGrowMessage);
+  }
 
   if (trigger && panel && closeBtn) {
     var isOpen = false;
     var TOP_GAP = 60;
     var SHEET_RADIUS = 24;
     var PILL_RADIUS = 100;
+    // Set while reacting to a popstate (browser back/forward) so open/close
+    // don't push yet another history entry on top of the one the user just
+    // navigated to.
+    var suppressHistory = false;
     var SPRING = { type: "spring", stiffness: 260, damping: 28, mass: 1 };
 
     // Position/size (top/left/width/height) is tweened by Motion for real
@@ -200,6 +303,10 @@ document.addEventListener("DOMContentLoaded", function () {
     function openPanel() {
       if (isOpen) return;
       isOpen = true;
+
+      if (!suppressHistory && window.location.pathname !== "/contact") {
+        window.history.pushState({ contact: true }, "", "/contact");
+      }
 
       var rect = trigger.getBoundingClientRect();
       document.body.classList.add("contact-open");
@@ -245,11 +352,22 @@ document.addEventListener("DOMContentLoaded", function () {
       form.hidden = false;
       form.reset();
       if (successMessage) successMessage.hidden = true;
+      if (submitError) submitError.hidden = true;
+      // Hand sizing back to the CSS min-height floor rather than measuring
+      // via scrollHeight — cleared text has nothing to measure anyway, and
+      // this keeps the resting position purely CSS-driven and immune to
+      // whatever width the field happens to be at when this runs.
+      if (messageField) messageField.style.height = "";
+      clearAllErrors();
     }
 
     function closePanel() {
       if (!isOpen) return;
       isOpen = false;
+
+      if (!suppressHistory && window.location.pathname === "/contact") {
+        window.history.pushState({ contact: false }, "", "/");
+      }
 
       var rect = trigger.getBoundingClientRect();
       panel.classList.remove("is-open");
@@ -293,18 +411,78 @@ document.addEventListener("DOMContentLoaded", function () {
       if (e.key === "Escape" && isOpen) closePanel();
     });
 
+    // Back/forward through history should open or close the panel to match,
+    // without pushing another entry on top of the one just navigated to.
+    window.addEventListener("popstate", function () {
+      suppressHistory = true;
+      if (window.location.pathname === "/contact") {
+        openPanel();
+      } else {
+        closePanel();
+      }
+      suppressHistory = false;
+    });
+
+    // A direct hit to /contact (or one restored from the 404.html redirect
+    // above) should land with the panel already open.
+    if (window.location.pathname === "/contact") {
+      openPanel();
+    }
+
     window.addEventListener("resize", function () {
       if (isOpen) setPanelRect(sheetRect());
     });
 
     if (form) {
+      var submitBtn = form.querySelector(".contact-form-submit");
+
       form.addEventListener("submit", function (e) {
         e.preventDefault();
-        // No backend yet — just confirm receipt and auto-dismiss. Wiring up
-        // where this actually gets sent is a later step.
-        form.hidden = true;
-        if (successMessage) successMessage.hidden = false;
-        window.setTimeout(closePanel, 1500);
+
+        var firstInvalid = null;
+        errorFields.forEach(function (field) {
+          if (field.input.validity.valid) {
+            hideFieldError(field);
+          } else {
+            showFieldError(field);
+            if (!firstInvalid) firstInvalid = field.input;
+          }
+        });
+        if (firstInvalid) {
+          firstInvalid.focus();
+          return;
+        }
+
+        if (submitError) submitError.hidden = true;
+        if (submitBtn) submitBtn.disabled = true;
+
+        // This site is fully static (no backend of its own), so the actual
+        // delivery to an inbox is handled by Web3Forms — it takes the
+        // access_key hidden field above, emails the rest of the submitted
+        // fields to the address that key is registered to, and returns
+        // whether that succeeded.
+        fetch("https://api.web3forms.com/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(Object.fromEntries(new FormData(form))),
+        })
+          .then(function (response) {
+            return response.json().then(function (data) {
+              return { ok: response.ok, data: data };
+            });
+          })
+          .then(function (result) {
+            if (!result.ok || !result.data.success) throw new Error("Web3Forms submission failed");
+            form.hidden = true;
+            if (successMessage) successMessage.hidden = false;
+            window.setTimeout(closePanel, 1500);
+          })
+          .catch(function () {
+            if (submitError) submitError.hidden = false;
+          })
+          .then(function () {
+            if (submitBtn) submitBtn.disabled = false;
+          });
       });
     }
   }

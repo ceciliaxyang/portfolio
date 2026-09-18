@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cecilia — Design</title>
+<script>
+  // GitHub Pages (and this project's local "serve" setup) have no
+  // server-side routing, so a direct hit to a path like /contact has no
+  // matching file and lands here instead of index.html. Remember where
+  // they were headed, then bounce to the real app shell, which restores
+  // it via history.replaceState (see js/main.js).
+  sessionStorage.setItem("redirectPath", location.pathname);
+  location.replace("/");
+</script>
+</head>
+<body></body>
+</html>

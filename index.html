@@ -39,7 +39,7 @@
 
     <section class="cs-section cs-card cs-pinned">
       <div class="cs-device cs-device--hostactions">
-        <video class="cs-hostactions-video" src="assets/host-actions.mp4" muted loop playsinline preload="auto" data-in-view-threshold="0.15"></video>
+        <video class="cs-hostactions-video" src="assets/host-actions.mp4" muted loop playsinline preload="auto" data-in-view-threshold="0.15" data-play-delay="400"></video>
       </div>
     </section>
 
@@ -78,20 +78,30 @@
       </svg>
     </button>
     <div class="contact-panel-inner" id="contactPanelInner">
-      <h2>Contact me</h2>
-      <form class="contact-form" id="contactForm">
-        <label>Name
-          <input type="text" name="name" autocomplete="name" required>
-        </label>
-        <label>Email
-          <input type="email" name="email" autocomplete="email" required>
-        </label>
-        <label>Message
-          <textarea name="message" rows="5" required></textarea>
-        </label>
-        <button type="submit" class="btn contact-form-submit">Send</button>
+      <form class="contact-form" id="contactForm" novalidate>
+        <input type="hidden" name="access_key" value="231e0cc0-85c7-4949-98cd-f015edc99929">
+        <div class="contact-field">
+          <label for="contactName" class="sr-only">Name</label>
+          <input type="text" id="contactName" name="name" autocomplete="name" placeholder="Name" aria-describedby="contactNameError" required>
+          <div class="contact-field-line"></div>
+          <p class="contact-field-error" id="contactNameError" hidden></p>
+        </div>
+        <div class="contact-field">
+          <label for="contactEmail" class="sr-only">Email</label>
+          <input type="email" id="contactEmail" name="email" autocomplete="email" placeholder="Email" aria-describedby="contactEmailError" required>
+          <div class="contact-field-line"></div>
+          <p class="contact-field-error" id="contactEmailError" hidden></p>
+        </div>
+        <div class="contact-field">
+          <label for="contactMessage" class="sr-only">Message</label>
+          <textarea id="contactMessage" name="message" placeholder="Message" rows="1" maxlength="500" aria-describedby="contactMessageError" required></textarea>
+          <div class="contact-field-line"></div>
+          <p class="contact-field-error" id="contactMessageError" hidden></p>
+        </div>
+        <button type="submit" class="btn contact-form-submit">Send message</button>
       </form>
       <p class="contact-form-success" id="contactFormSuccess" hidden>Thanks — I'll get back to you soon.</p>
+      <p class="contact-form-error" id="contactFormError" hidden>Something went wrong sending your message — please try again.</p>
     </div>
   </div>
 
