@@ -22,6 +22,30 @@ document.addEventListener("DOMContentLoaded", function () {
   var prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   var mm = gsap.matchMedia();
 
+  // The hero's height is computed (not a fixed CSS value) so that exactly
+  // 20% of the first card's own device — not just 20% of its section —
+  // peeks into view before any scrolling. The device is vertically centered
+  // within its section, but the section itself isn't reliably one viewport
+  // tall: under the 900px breakpoint it's flex-centered with 60px top/bottom
+  // padding, so on a tall/narrow device the section can grow past 100vh to
+  // fit that padding. Rather than assume a section height, this measures
+  // the section and device as currently laid out and solves for the hero
+  // height that makes the device's reveal exactly 20% of its own height.
+  // This must run before setupPinnedStack() below, since ScrollTrigger
+  // reads sections' offsetTop, which this changes.
+  function updateHeroHeight() {
+    var hero = document.querySelector(".hero");
+    var section = document.querySelector(".cs-pinned");
+    var firstDevice = section ? section.querySelector(".cs-device") : null;
+    if (!hero || !section || !firstDevice) return;
+    var deviceHeight = firstDevice.getBoundingClientRect().height;
+    var sectionHeight = section.getBoundingClientRect().height;
+    var deviceOffsetWithinSection = (sectionHeight - deviceHeight) / 2;
+    var targetVisible = 0.2 * deviceHeight;
+    hero.style.height = window.innerHeight - deviceOffsetWithinSection - targetVisible + "px";
+  }
+  updateHeroHeight();
+
   function setupPinnedStack(useTilt) {
     var releaseEl = document.querySelector(".contact");
     var lastCard = document.querySelector(".cs-card.cs-scroll");
@@ -112,6 +136,17 @@ document.addEventListener("DOMContentLoaded", function () {
   mm.add("(max-width: 900px)", function () {
     if (prefersReducedMotion) return;
     setupPinnedStack(false);
+  });
+
+  // Resizing changes the first device's rendered height, so the hero needs
+  // re-measuring too — and ScrollTrigger needs to re-read positions after.
+  var heroResizeTimer;
+  window.addEventListener("resize", function () {
+    window.clearTimeout(heroResizeTimer);
+    heroResizeTimer = window.setTimeout(function () {
+      updateHeroHeight();
+      ScrollTrigger.refresh();
+    }, 150);
   });
 
   // Card videos: only start playing once the card is substantially on screen.

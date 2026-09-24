@@ -50,7 +50,13 @@ h1, h2, h3, h4, p { text-wrap: balance; }
 
 /* Hero */
 .hero {
-  padding: 190px 0 140px;
+  /* 80vh tall with the headline centered inside it, so the first pinned
+     card (100vh) starts right after at the 80vh mark — its top 20vh sits
+     inside the initial viewport as a peek before any scrolling. */
+  height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
 }
 
@@ -58,8 +64,11 @@ h1, h2, h3, h4, p { text-wrap: balance; }
   margin: 0 auto;
   max-width: 720px;
   /* Fixed 60px down to 700px; below that it scales proportionally down to a
-     42px floor at a 320px viewport (linear interpolation via clamp()). */
-  font-size: clamp(42px, 4.737vw + 26.84px, 60px);
+     32px floor at a 320px viewport (linear interpolation via clamp()).
+     Lowered from a 42px floor so the headline caps at 4 lines instead of 5
+     on common phone widths — padding alone couldn't get there (verified
+     empirically: even near-zero side padding only shaved one line off). */
+  font-size: clamp(32px, 7.368vw + 8.42px, 60px);
   font-weight: 500;
   line-height: 1.13;
   letter-spacing: -0.02em;
@@ -131,7 +140,6 @@ footer {
 }
 
 @media (max-width: 640px) {
-  .hero { padding: 120px 0 90px; }
   .contact { padding: 70px 0 120px; }
 }
 
@@ -315,8 +323,13 @@ footer {
 /* Mobile / reduced motion: stack normally, no pinning, no tilt */
 @media (max-width: 900px) {
   .cs-section { height: auto; min-height: 100vh; }
-  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(1000px, 85vw); }
+  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(1000px, 85vw); aspect-ratio: 3 / 4; }
   .cs-card { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
+  /* Both phone mockups read too small against the taller mobile card, so
+     they're bumped up on this breakpoint only: lock to 110% of its desktop
+     size (52.7% -> 57.97%), tips to 120% (39.6% -> 47.52%). */
+  .cs-lock-phone { width: 57.97%; }
+  .cs-tips-phone { width: 47.52%; }
 }
 
 /* Contact "expandable screen": the trigger button morphs into a full-page
