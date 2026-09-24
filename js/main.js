@@ -194,9 +194,32 @@ document.addEventListener("DOMContentLoaded", function () {
   var panel = document.getElementById("contactPanel");
   var closeBtn = document.getElementById("contactPanelClose");
   var form = document.getElementById("contactForm");
-  var successMessage = document.getElementById("contactFormSuccess");
   var submitError = document.getElementById("contactFormError");
   var messageField = document.getElementById("contactMessage");
+  var submitBtn = document.getElementById("contactSubmitBtn");
+  var submitLabel = submitBtn ? submitBtn.querySelector(".contact-form-submit-text") : null;
+
+  var SUBMIT_LABELS = { idle: "Send message", sending: "Sending...", success: "Message sent" };
+
+  // Cross-fades the button's label to the new state's text instead of
+  // swapping it instantly: fade the current text out, swap the text and
+  // the success/sending classes once it's invisible, then let it fade back
+  // in — the checkmark's own width/opacity/scale transition (in CSS) runs
+  // at the same time, so it pops in as the "Message sent" label settles.
+  function setSubmitState(state, animate) {
+    if (!submitBtn || !submitLabel) return;
+    var apply = function () {
+      submitLabel.textContent = SUBMIT_LABELS[state];
+      submitBtn.classList.toggle("is-success", state === "success");
+      submitBtn.classList.remove("is-changing");
+    };
+    if (animate === false) {
+      apply();
+      return;
+    }
+    submitBtn.classList.add("is-changing");
+    window.setTimeout(apply, 160);
+  }
 
   // Message field grows with its content instead of scrolling internally,
   // so the send button gets pushed down once typed text wraps past the
@@ -351,7 +374,8 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!form) return;
       form.hidden = false;
       form.reset();
-      if (successMessage) successMessage.hidden = true;
+      setSubmitState("idle", false);
+      if (submitBtn) submitBtn.disabled = false;
       if (submitError) submitError.hidden = true;
       // Hand sizing back to the CSS min-height floor rather than measuring
       // via scrollHeight — cleared text has nothing to measure anyway, and
@@ -434,8 +458,6 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     if (form) {
-      var submitBtn = form.querySelector(".contact-form-submit");
-
       form.addEventListener("submit", function (e) {
         e.preventDefault();
 
@@ -455,6 +477,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (submitError) submitError.hidden = true;
         if (submitBtn) submitBtn.disabled = true;
+        setSubmitState("sending");
 
         // This site is fully static (no backend of its own), so the actual
         // delivery to an inbox is handled by Web3Forms — it takes the
@@ -473,15 +496,16 @@ document.addEventListener("DOMContentLoaded", function () {
           })
           .then(function (result) {
             if (!result.ok || !result.data.success) throw new Error("Web3Forms submission failed");
-            form.hidden = true;
-            if (successMessage) successMessage.hidden = false;
-            window.setTimeout(closePanel, 1500);
+            setSubmitState("success");
+            // Leave the "Message sent" + checkmark state on screen for a
+            // beat before the panel closes, rather than swapping it away
+            // the instant it appears.
+            window.setTimeout(closePanel, 1600);
           })
           .catch(function () {
-            if (submitError) submitError.hidden = false;
-          })
-          .then(function () {
+            setSubmitState("idle");
             if (submitBtn) submitBtn.disabled = false;
+            if (submitError) submitError.hidden = false;
           });
       });
     }

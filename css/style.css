@@ -431,14 +431,6 @@ body.contact-open > footer {
   transition-delay: 0.15s;
 }
 
-.contact-form-success {
-  margin: 0;
-  padding: 16px 0 0;
-  color: #ffffff;
-  font-size: 16px;
-  line-height: 1.5;
-}
-
 .contact-form-error {
   margin: 0;
   padding: 16px 0 0;
@@ -493,10 +485,9 @@ body.contact-open > footer {
   font-weight: 500;
   /* Same fixed-then-shrink curve as the headlines: fixed 48px down to
      700px, then scales proportionally down to a 34px floor at a 320px
-     viewport (same 0.7 floor/max ratio). Letter-spacing uses em so it
-     scales together with the fluid font-size instead of staying fixed. */
+     viewport (same 0.7 floor/max ratio). */
   font-size: clamp(34px, 3.684vw + 22.21px, 48px);
-  letter-spacing: -0.0571em;
+  letter-spacing: -0.02em;
   line-height: 1.15;
   resize: none;
   overflow: hidden;
@@ -530,6 +521,7 @@ body.contact-open > footer {
 .contact-form-submit {
   width: 100%;
   margin-top: 32px;
+  gap: 8px;
   --button-bg: #ffffff;
   --button-text: #171717;
   /* Sticks to the bottom of .contact-panel's scrollport (its nearest
@@ -537,4 +529,39 @@ body.contact-open > footer {
      viewport, instead of getting pushed down and off-screen with it. */
   position: sticky;
   bottom: 24px;
+}
+
+.contact-form-submit-text {
+  transition: opacity 0.16s ease;
+}
+
+/* Text fades out, the label swaps underneath (in JS), then fades back in —
+   this class only covers the "out" half of that cross-fade. */
+.contact-form-submit.is-changing .contact-form-submit-text {
+  opacity: 0;
+}
+
+.contact-form-submit-check {
+  width: 0;
+  opacity: 0;
+  transform: scale(0.4);
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.25s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.contact-form-submit.is-success .contact-form-submit-check {
+  width: 16px;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.contact-form-submit:disabled {
+  cursor: default;
+}
+
+.contact-form-submit:disabled:hover {
+  opacity: 1;
 }

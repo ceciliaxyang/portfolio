@@ -98,9 +98,13 @@
           <div class="contact-field-line"></div>
           <p class="contact-field-error" id="contactMessageError" hidden></p>
         </div>
-        <button type="submit" class="btn contact-form-submit">Send message</button>
+        <button type="submit" class="btn contact-form-submit" id="contactSubmitBtn">
+          <span class="contact-form-submit-text">Send message</span>
+          <svg class="contact-form-submit-check" width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path d="M3 8.5L6.5 12L13 4.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </form>
-      <p class="contact-form-success" id="contactFormSuccess" hidden>Thanks — I'll get back to you soon.</p>
       <p class="contact-form-error" id="contactFormError" hidden>Something went wrong sending your message — please try again.</p>
     </div>
   </div>
