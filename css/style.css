@@ -57,7 +57,9 @@ h1, h2, h3, h4, p { text-wrap: balance; }
 .hero h1 {
   margin: 0 auto;
   max-width: 720px;
-  font-size: clamp(34px, 5.4vw, 60px);
+  /* Fixed 60px down to 700px; below that it scales proportionally down to a
+     42px floor at a 320px viewport (linear interpolation via clamp()). */
+  font-size: clamp(42px, 4.737vw + 26.84px, 60px);
   font-weight: 500;
   line-height: 1.13;
   letter-spacing: -0.02em;
@@ -90,7 +92,9 @@ h1, h2, h3, h4, p { text-wrap: balance; }
 
 .contact h2 {
   margin: 0 0 40px;
-  font-size: clamp(30px, 5vw, 60px);
+  /* Same fixed-then-shrink curve as the hero h1: 60px down to 700px, then
+     scales proportionally down to a 42px floor at a 320px viewport. */
+  font-size: clamp(42px, 4.737vw + 26.84px, 60px);
   font-weight: 500;
   line-height: 1.13;
   letter-spacing: -0.02em;
@@ -100,12 +104,14 @@ h1, h2, h3, h4, p { text-wrap: balance; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   padding: 14px 24px;
   background: var(--button-bg);
   color: var(--button-text);
   border-radius: 100px;
   font-size: 16px;
   font-weight: 500;
+  white-space: nowrap;
   text-decoration: none;
   line-height: 20px;
   border: none;
@@ -157,12 +163,121 @@ footer {
   top: 50%;
   left: 50%;
   transform: translate3d(-50%, -50%, 0) rotate(0deg);
-  width: min(800px, 90vw, calc((100vh - 120px) * 800 / 956));
-  aspect-ratio: 800 / 956;
+  width: min(1000px, 90vw, calc((100vh - 120px) * 1000 / 960));
+  aspect-ratio: 1000 / 960;
   border-radius: 36px;
   overflow: hidden;
   background: #ffffff;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.18);
+  will-change: transform;
+}
+
+/* Card 1 — Today tab screen recording */
+.cs-device--today {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-today-video {
+  height: 100%;
+  width: auto;
+  max-width: none;
+}
+
+/* Card 3 — Setup flow screen recording */
+.cs-device--setup {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-setup-video {
+  /* This recording's phone mockup sits small within a much wider frame
+     (unlike the other card videos), so scale up beyond 100% to bring the
+     phone itself to a comparable size instead of filling by frame height. */
+  width: 250%;
+  height: auto;
+  max-width: none;
+}
+
+/* Card 4 — Host actions: full-bleed grid/collage recording, no single
+   centered phone mockup, so it just covers the whole card like a background. */
+.cs-hostactions-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Card 5 — AirKey guest unlock instructions */
+.cs-device--airkey {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-airkey-video {
+  height: 100%;
+  width: auto;
+  max-width: none;
+}
+
+/* Card 6 — Tips enter/exit thumbnail view (from Figma: Cecilia personal,
+   node 2055:17857). A phone-frame photo with the recording clipped into the
+   screen area, plus a static "global nav" export layered on top at the
+   bottom to cover the (incorrect) nav bar baked into the recording itself. */
+.cs-device--tips {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cs-tips-phone {
+  position: relative;
+  width: 39.6%;
+  aspect-ratio: 1716 / 3536;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.16));
+}
+
+.cs-tips-frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.cs-tips-screen {
+  position: absolute;
+  left: 4.03%;
+  top: 1.72%;
+  width: 91.61%;
+  height: 96.61%;
+  /* A single border-radius percentage resolves horizontal radius against
+     width and vertical radius against height independently, which on this
+     non-square box (~0.46 aspect) produced an elliptical corner instead of
+     the phone's true circular one. The two-value slash syntax lets us pick
+     a height-percentage that resolves to the same pixel radius as the
+     width-percentage, restoring a circular corner. */
+  border-radius: 13.84% / 6.37%;
+  overflow: hidden;
+}
+
+.cs-tips-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cs-tips-nav {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
 /* Card 2 — Smart Lock connect screen (from Figma: Cecilia personal, node 2055:14659) */
@@ -170,13 +285,12 @@ footer {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  padding-bottom: 4%;
 }
 
 .cs-lock-phone {
   position: relative;
-  width: 62%;
-  aspect-ratio: 1049 / 1662;
+  width: 52.7%;
+  aspect-ratio: 1049 / 1610;
   filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.16));
 }
 
@@ -191,9 +305,9 @@ footer {
 .cs-lock-video {
   position: absolute;
   left: 50%;
-  top: 42.3%;
+  top: 43.7%;
   transform: translate(-50%, -50%);
-  width: 27%;
+  width: 42%;
   aspect-ratio: 380 / 540;
   object-fit: cover;
 }
@@ -201,6 +315,253 @@ footer {
 /* Mobile / reduced motion: stack normally, no pinning, no tilt */
 @media (max-width: 900px) {
   .cs-section { height: auto; min-height: 100vh; }
-  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(320px, 78vw); }
+  .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(1000px, 85vw); }
   .cs-card { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
+}
+
+/* Contact "expandable screen": the trigger button morphs into a full-page
+   panel. Geometry (top/left/width/height and the four corner radii) is
+   animated via inline styles set from JS (a FLIP-style rect tween), not by
+   this CSS — these rules just declare the panel's at-rest appearance
+   before JS takes over on open. When open, the panel stops 100px short of
+   the viewport's top edge (so the page peeks through above it) but stays
+   flush with the bottom, hence rounded top corners and square bottom ones. */
+body.contact-open { overflow: hidden; }
+
+.wrap,
+.cs-wrap,
+footer {
+  transition: filter 0.4s ease;
+}
+
+body.contact-open > .wrap,
+body.contact-open > .cs-wrap,
+body.contact-open > footer {
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.contact-trigger { position: relative; transition: opacity 0.25s ease; }
+
+.contact-panel {
+  /* top/left/width/height are tweened directly by Motion (js/main.js) for
+     real spring physics. The four border-*-radius longhands are handled by
+     this CSS transition instead — Motion 11.18.2 has a bug where animating
+     border-top-left-radius / border-top-right-radius from a non-zero
+     starting value silently no-ops (confirmed in isolation; unrelated to
+     any other property in the same call), which is what caused the old
+     "jumps to a rectangle, then snaps round" artifact on close. A native
+     CSS transition doesn't have that bug and, with a back-out easing
+     curve, reads as spring-like anyway. */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  z-index: 1000;
+  overflow-y: auto;
+  background: #171717;
+  color: #ffffff;
+  transition: border-top-left-radius 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-top-right-radius 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-bottom-left-radius 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-bottom-right-radius 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  visibility: hidden;
+}
+
+.contact-panel-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 100px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, background 0.15s ease;
+}
+
+.contact-panel-close:hover { background: rgba(255, 255, 255, 0.22); }
+
+.contact-panel.is-open .contact-panel-close {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.contact-panel-inner {
+  /* Centers the form vertically within the sheet: min-height matches the
+     panel's own height (set inline from JS), so the flex column centers
+     when content fits and still scrolls normally if it doesn't. */
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Three width tiers: 60% above 1200px, 80% from 641-1200px, then
+     full-width again once it's as narrow as the mobile card stack gets
+     (reusing the site's existing 640px breakpoint there). */
+  width: 60%;
+  margin: 0 auto;
+  padding: 40px 24px;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+@media (max-width: 1200px) {
+  .contact-panel-inner {
+    width: 80%;
+  }
+}
+
+@media (max-width: 640px) {
+  .contact-panel-inner {
+    width: 100%;
+  }
+}
+
+.contact-panel.is-open .contact-panel-inner {
+  opacity: 1;
+  transition-delay: 0.15s;
+}
+
+.contact-form-error {
+  margin: 0;
+  padding: 16px 0 0;
+  color: #ff3b30;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Fields: no boxed background — large text sitting on a hairline underline,
+   matching the Figma reference (node 2088:20224 / 2088:23939). The ghost
+   placeholder and the typed value are just the input's native placeholder
+   vs. its own text color; no JS needed for that swap. The underline is its
+   own element (rather than a border on .contact-field) so the error message
+   can sit below it, matching node 2088:25236. */
+.contact-field {
+  padding: 16px 0;
+}
+
+.contact-field-line {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.contact-field-error {
+  margin: 8px 0 0;
+  color: #ff3b30;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.contact-form input,
+.contact-form textarea {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  color: #ffffff;
+  font: inherit;
+  font-weight: 500;
+  /* Same fixed-then-shrink curve as the headlines: fixed 48px down to
+     700px, then scales proportionally down to a 34px floor at a 320px
+     viewport (same 0.7 floor/max ratio). */
+  font-size: clamp(34px, 3.684vw + 22.21px, 48px);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  resize: none;
+  overflow: hidden;
+}
+
+.contact-form textarea {
+  /* A fixed rest gap between the text and the underline below it, instead
+     of the line sitting flush against the text. min-height (not JS) is
+     what actually holds the line at rest here — a pure-CSS floor means it's
+     correct from the very first paint, with no dependency on when/at-what-
+     width a JS measurement happens to run. 1.15em matches the line-height
+     above, so this is "one line + the 64px gap," staying responsive to the
+     fluid font-size. box-sizing:border-box means the padding is already
+     included in scrollHeight, so autoGrowMessage() (used only to grow the
+     field as typed text wraps) naturally only grows past this floor once
+     wrapped content actually needs more room. */
+  min-height: calc(1.15em + 64px);
+  padding-bottom: 64px;
+}
+
+.contact-form input::placeholder,
+.contact-form textarea::placeholder {
+  color: #6b6b6b;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  outline: none;
+}
+
+.contact-form-submit {
+  width: 100%;
+  margin-top: 32px;
+  gap: 8px;
+  --button-bg: #ffffff;
+  --button-text: #171717;
+  /* Sticks to the bottom of .contact-panel's scrollport (its nearest
+     scrolling ancestor) once a long message grows the form taller than the
+     viewport, instead of getting pushed down and off-screen with it. */
+  position: sticky;
+  bottom: 24px;
+}
+
+.contact-form-submit-text {
+  transition: opacity 0.16s ease;
+}
+
+/* Text fades out, the label swaps underneath (in JS), then fades back in —
+   this class only covers the "out" half of that cross-fade. */
+.contact-form-submit.is-changing .contact-form-submit-text {
+  opacity: 0;
+}
+
+.contact-form-submit-check {
+  width: 0;
+  opacity: 0;
+  transform: scale(0.4);
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.34, 1.56, 0.64, 1),
+    opacity 0.25s ease,
+    transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.contact-form-submit.is-success .contact-form-submit-check {
+  width: 16px;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.contact-form-submit:disabled {
+  cursor: default;
+}
+
+.contact-form-submit:disabled:hover {
+  opacity: 1;
 }
