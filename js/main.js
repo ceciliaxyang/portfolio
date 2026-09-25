@@ -1,4 +1,12 @@
-import { animate } from "https://esm.sh/motion@11";
+// Motion is only needed for the contact panel's spring, but it pulls ~140
+// module files from esm.sh. A static `import` would hold back every line of
+// this file (pinning, the page-load entrance, the hero peek, video autoplay)
+// until they all arrived — several seconds on a cold load — or break the whole
+// page if the CDN failed. Instead it loads in the background from the start,
+// and the panel falls back to a plain jump if it never arrives.
+var motionReady = import("https://esm.sh/motion@11").catch(function () {
+  return null;
+});
 
 // GitHub Pages (and this project's local "serve" setup) have no server-side
 // routing, so a direct hit to /contact has no matching file and falls
@@ -390,6 +398,22 @@ document.addEventListener("DOMContentLoaded", function () {
       return { tl: SHEET_RADIUS, tr: SHEET_RADIUS, bl: 0, br: 0 };
     }
 
+    // Springs the panel to a rect with Motion; resolves when it settles.
+    // If Motion never loaded, just jump there instead of leaving it stuck.
+    function animatePanel(rect) {
+      return motionReady.then(function (motion) {
+        if (!motion) {
+          setPanelRect(rect);
+          return;
+        }
+        return motion.animate(
+          panel,
+          { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
+          SPRING
+        ).finished;
+      });
+    }
+
     function openPanel() {
       if (isOpen) return;
       isOpen = true;
@@ -421,7 +445,7 @@ document.addEventListener("DOMContentLoaded", function () {
         panel.getBoundingClientRect(); // commit the start frame above first
         var target = sheetRect();
         setPanelRadii(sheetRadii()); // CSS transition takes it from here
-        animate(panel, { top: target.top, left: target.left, width: target.width, height: target.height }, SPRING);
+        animatePanel(target);
       });
     }
 
@@ -475,21 +499,17 @@ document.addEventListener("DOMContentLoaded", function () {
       }
 
       setPanelRadii(pillRadii()); // CSS transition takes it from here
-      var controls = animate(
-        panel,
-        { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
-        SPRING
-      );
+      var settled = animatePanel(rect);
 
       // Bring the button's own label back well before the spring's tail has
       // fully settled — by ~300ms the panel is already visually on top of
       // the button's position, so revealing it here (instead of waiting on
-      // controls.finished) removes the "blank pill" lag without any visual
+      // the animation's finish) removes the "blank pill" lag without any visual
       // seam, since the panel still covers the button until it's shrunk all
       // the way down.
       window.setTimeout(revealTrigger, 300);
 
-      controls.finished.then(function () {
+      settled.then(function () {
         panel.style.visibility = "hidden";
         resetForm();
       });
