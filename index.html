@@ -18,6 +18,20 @@
 <meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="css/style.css">
 <script>
+  // Card media (videos + frame images) starts hidden and fades in once loaded
+  // (see .js-media in css/style.css; js/main.js marks each card ready). The
+  // timeout is a failsafe so media can never stay hidden if that never runs.
+  // Skipped for reduced-motion users.
+  (function () {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    var root = document.documentElement;
+    root.classList.add("js-media");
+    setTimeout(function () {
+      root.classList.remove("js-media");
+    }, 8000);
+  })();
+</script>
+<script>
   // Marks the page as "entrance pending" so the first card starts hidden
   // (see .js-enter in css/style.css) instead of flashing in before its
   // entrance animation in js/main.js runs. Skipped for reduced-motion users

@@ -189,6 +189,34 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 150);
   });
 
+  // Card content fades in once every video/image in the card has its first
+  // frame (see .js-media in css/style.css). Anything that errors counts as
+  // done, so one broken asset can't keep a card blank.
+  document.querySelectorAll(".cs-device").forEach(function (device) {
+    var media = device.querySelectorAll("video, img");
+    var pending = 0;
+
+    function markReady() {
+      device.classList.add("is-media-ready");
+    }
+
+    function settle() {
+      pending -= 1;
+      if (pending <= 0) markReady();
+    }
+
+    media.forEach(function (el) {
+      var isVideo = el.tagName === "VIDEO";
+      var ready = isVideo ? el.readyState >= 2 : el.complete;
+      if (ready) return;
+      pending += 1;
+      el.addEventListener(isVideo ? "loadeddata" : "load", settle, { once: true });
+      el.addEventListener("error", settle, { once: true });
+    });
+
+    if (pending === 0) markReady();
+  });
+
   // Card videos: only start playing once the card is substantially on screen.
   // (Cards can be taller than the viewport on shorter screens, so we don't
   // require 100% visibility — that could be impossible to satisfy.)
