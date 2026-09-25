@@ -1,27 +1,13 @@
 :root {
+  /* Light only: the site deliberately ignores the visitor's dark-mode
+     setting. color-scheme keeps browser-drawn UI (scrollbars, form
+     controls) light too. */
+  color-scheme: light;
   --bg: #ffffff;
   --text: #000000;
   --muted: #6b6b6b;
   --button-bg: #222222;
   --button-text: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #0b0b0b;
-    --text: #f5f5f5;
-    --muted: #9a9a9a;
-    --button-bg: #f5f5f5;
-    --button-text: #0b0b0b;
-  }
-}
-
-:root[data-theme="dark"] {
-  --bg: #0b0b0b;
-  --text: #f5f5f5;
-  --muted: #9a9a9a;
-  --button-bg: #f5f5f5;
-  --button-text: #0b0b0b;
 }
 
 * { box-sizing: border-box; }
