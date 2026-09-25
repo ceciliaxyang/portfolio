@@ -138,6 +138,38 @@ document.addEventListener("DOMContentLoaded", function () {
     setupPinnedStack(false);
   });
 
+  // Page-load entrance: the headline's fade + rise is a CSS animation (it
+  // finishes around 1.0s); the first card follows, overlapping its tail —
+  // starting ~0.6s after navigation began, fading in while rising 60px.
+  // Driven by GSAP rather than CSS keyframes because the card's transform is
+  // already owned by the scroll scale/tilt tween, and GSAP composes y with
+  // scale/rotate instead of fighting over the same transform. The delay is
+  // measured from navigation start (not from now) so it stays in sync with
+  // the headline even when this script loads late.
+  var rootEl = document.documentElement;
+  if (rootEl.classList.contains("js-enter")) {
+    var entranceDevice = document.querySelector(".cs-first .cs-device");
+    if (entranceDevice) {
+      gsap.fromTo(
+        entranceDevice,
+        { opacity: 0, y: 60 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 1,
+          ease: "expo.out",
+          delay: Math.max(0, 0.6 - performance.now() / 1000),
+          onComplete: function () {
+            gsap.set(entranceDevice, { clearProps: "opacity" });
+          },
+        }
+      );
+    }
+    // gsap has now set the card's inline start state, so the CSS hiding
+    // rule is no longer needed (and must not linger past the animation).
+    rootEl.classList.remove("js-enter");
+  }
+
   // Resizing changes the first device's rendered height, so the hero needs
   // re-measuring too — and ScrollTrigger needs to re-read positions after.
   var heroResizeTimer;
