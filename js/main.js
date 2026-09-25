@@ -61,13 +61,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (!releaseEl || !lastCard || !pinnedSections.length) return;
 
-    var releasePoint = releaseEl.offsetTop - window.innerHeight;
+    // A function (not a number) so ScrollTrigger re-reads it on every refresh:
+    // the layout changes when the window is resized or a phone is rotated,
+    // and a value captured once at load would leave the cards pinned over the
+    // contact section (or unpinned too early) afterwards.
+    var releasePoint = function () {
+      return releaseEl.offsetTop - window.innerHeight;
+    };
     var tiltAngles = [-6, 5, -5, 6, -4];
 
     pinnedSections.forEach(function (section, index, sections) {
       var device = section.querySelector(".cs-device");
       var nextSection = sections[index + 1] || lastCard;
-      var delta = nextSection.offsetTop - section.offsetTop;
+      var getDelta = function () {
+        return nextSection.offsetTop - section.offsetTop;
+      };
       // Desktop cards fill (nearly) a full screen, so they pin when their top
       // reaches the top of the screen. Mobile sections hug a card that's much
       // shorter than the screen, so they pin when the card is centered
@@ -75,7 +83,9 @@ document.addEventListener("DOMContentLoaded", function () {
       // below it.
       var edge = useTilt ? "top" : "center";
       var anchorPoint = edge + " " + edge;
-      var anchorEnd = edge + "+=" + delta + " " + edge;
+      var anchorEnd = function () {
+        return edge + "+=" + getDelta() + " " + edge;
+      };
 
       gsap.to(section, {
         scrollTrigger: {
