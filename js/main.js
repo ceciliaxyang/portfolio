@@ -68,11 +68,19 @@ document.addEventListener("DOMContentLoaded", function () {
       var device = section.querySelector(".cs-device");
       var nextSection = sections[index + 1] || lastCard;
       var delta = nextSection.offsetTop - section.offsetTop;
+      // Desktop cards fill (nearly) a full screen, so they pin when their top
+      // reaches the top of the screen. Mobile sections hug a card that's much
+      // shorter than the screen, so they pin when the card is centered
+      // instead — otherwise it would sit stuck at the top with blank space
+      // below it.
+      var edge = useTilt ? "top" : "center";
+      var anchorPoint = edge + " " + edge;
+      var anchorEnd = edge + "+=" + delta + " " + edge;
 
       gsap.to(section, {
         scrollTrigger: {
           trigger: section,
-          start: "top top",
+          start: anchorPoint,
           end: releasePoint,
           pin: true,
           pinSpacing: false,
@@ -106,8 +114,8 @@ document.addEventListener("DOMContentLoaded", function () {
             ease: "none",
             scrollTrigger: {
               trigger: section,
-              start: "top top",
-              end: "top+=" + delta + " top",
+              start: anchorPoint,
+              end: anchorEnd,
               scrub: 1,
               fastScrollEnd: true,
             },
@@ -123,8 +131,8 @@ document.addEventListener("DOMContentLoaded", function () {
             ease: "none",
             scrollTrigger: {
               trigger: section,
-              start: "top top",
-              end: "top+=" + delta + " top",
+              start: anchorPoint,
+              end: anchorEnd,
               scrub: 1,
               fastScrollEnd: true,
             },

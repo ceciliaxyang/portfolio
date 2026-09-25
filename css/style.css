@@ -328,7 +328,11 @@ footer {
 
 /* Mobile / reduced motion: stack normally, no pinning, no tilt */
 @media (max-width: 900px) {
-  .cs-section { height: auto; min-height: 100vh; }
+  /* Sections hug their card (card + the 60px padding below) instead of each
+     being a full screen tall. With a shorter card in a full-screen section, the
+     blank space between cards was ~48% of the screen vs ~16% on desktop, so
+     the next card took far too long to arrive and the overlap effect was lost. */
+  .cs-section { height: auto; }
   .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(1000px, 85vw); aspect-ratio: 3 / 4; }
   .cs-card { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
   /* Both phone mockups read too small against the taller mobile card, so
