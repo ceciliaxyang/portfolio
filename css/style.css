@@ -173,6 +173,19 @@ footer {
   opacity: 0;
 }
 
+/* Card content (the video, or the phone frame + video) fades in once all of
+   the card's media has loaded, instead of popping in over the empty white
+   card. Hidden only while .js-media is on <html>, which an inline script in
+   <head> sets and removes after a failsafe timeout; main.js adds
+   .is-media-ready per card. */
+.cs-device > * {
+  transition: opacity 0.7s ease;
+}
+
+.js-media .cs-device:not(.is-media-ready) > * {
+  opacity: 0;
+}
+
 /* Card 1 — Today tab screen recording */
 .cs-device--today {
   display: flex;
