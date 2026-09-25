@@ -210,8 +210,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Resizing changes the first device's rendered height, so the hero needs
   // re-measuring too — and ScrollTrigger needs to re-read positions after.
+  //
+  // On phones the address bar collapsing/expanding fires a resize (height
+  // only, and small) as soon as you start scrolling. Reacting to it re-sized
+  // the hero — shifting everything below it — and forced a full ScrollTrigger
+  // re-layout mid-scroll, which showed up as a stall and jump at the start of
+  // the page. GSAP already ignores those on touch devices; this does the same:
+  // skip touch resizes where only the height changed, by under 25%. Rotation
+  // (width changes) and real resizes still go through.
   var heroResizeTimer;
+  var lastWidth = window.innerWidth;
+  var lastHeight = window.innerHeight;
+  var isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
   window.addEventListener("resize", function () {
+    var w = window.innerWidth;
+    var h = window.innerHeight;
+    if (isTouchDevice && w === lastWidth && Math.abs(h - lastHeight) < h * 0.25) return;
+    lastWidth = w;
+    lastHeight = h;
     window.clearTimeout(heroResizeTimer);
     heroResizeTimer = window.setTimeout(function () {
       updateHeroHeight();
