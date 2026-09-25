@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
   updateHeroHeight();
 
-  function setupPinnedStack(useTilt) {
+  function setupPinnedStack(isDesktop) {
     var releaseEl = document.querySelector(".contact");
     var lastCard = document.querySelector(".cs-card.cs-scroll");
     var pinnedSections = gsap.utils.toArray(".cs-pinned");
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // shorter than the screen, so they pin when the card is centered
       // instead — otherwise it would sit stuck at the top with blank space
       // below it.
-      var edge = useTilt ? "top" : "center";
+      var edge = isDesktop ? "top" : "center";
       var anchorPoint = edge + " " + edge;
       var anchorEnd = function () {
         return edge + "+=" + getDelta() + " " + edge;
@@ -113,43 +113,55 @@ document.addEventListener("DOMContentLoaded", function () {
 
       if (!device) return;
 
-      if (useTilt) {
-        var tilt = tiltAngles[index % tiltAngles.length];
-        gsap.fromTo(
-          device,
-          { scale: 1, rotate: 0 },
-          {
-            scale: 0.5,
-            rotate: tilt,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: anchorPoint,
-              end: anchorEnd,
-              scrub: 1,
-              fastScrollEnd: true,
-            },
-          }
-        );
-      } else {
-        // Mobile: a gentler scale only, no rotation and no fade — cards stay fully opaque.
-        gsap.fromTo(
-          device,
-          { scale: 1 },
-          {
-            scale: 0.88,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: anchorPoint,
-              end: anchorEnd,
-              scrub: 1,
-              fastScrollEnd: true,
-            },
-          }
-        );
-      }
+      // Both breakpoints recede identically: shrink to half size with a tilt.
+      // Cards stay fully opaque.
+      var tilt = tiltAngles[index % tiltAngles.length];
+      gsap.fromTo(
+        device,
+        { scale: 1, rotate: 0 },
+        {
+          scale: 0.5,
+          rotate: tilt,
+          ease: "none",
+          scrollTrigger: {
+            trigger: section,
+            start: anchorPoint,
+            end: anchorEnd,
+            scrub: 1,
+            fastScrollEnd: true,
+          },
+        }
+      );
     });
+
+    // Mobile only: every pinned card sits stacked in the same spot, so their
+    // box-shadows compound into a heavy smudge by the end of the scroll. Keep
+    // shadows on just the two newest cards: as card N arrives, card N-2 (and
+    // everything before it) loses its shadow, fading out via a CSS transition.
+    // Driven by isActive (not enter/leave events) so the state is also correct
+    // if the page is already scrolled when this runs, e.g. after a resize.
+    if (!isDesktop) {
+      var stack = pinnedSections.concat([lastCard]);
+      stack.forEach(function (sec) {
+        var dev = sec.querySelector(".cs-device");
+        if (dev) dev.classList.remove("no-shadow");
+      });
+      stack.forEach(function (sec, k) {
+        if (k < 2) return;
+        var older = stack[k - 2].querySelector(".cs-device");
+        if (!older) return;
+        ScrollTrigger.create({
+          trigger: sec,
+          start: "top 60%",
+          // Well past the bottom of the page: "max" ended the range exactly at
+          // the last scroll position, which flipped every shadow back on there.
+          end: "+=100000",
+          onToggle: function (self) {
+            older.classList.toggle("no-shadow", self.isActive);
+          },
+        });
+      });
+    }
   }
 
   // Desktop / motion-ok: pinned stack, each card shrinking + tilting as the next covers it.
@@ -158,7 +170,7 @@ document.addEventListener("DOMContentLoaded", function () {
     setupPinnedStack(true);
   });
 
-  // Mobile / motion-ok: same pinned stack, gentler fade + scale instead of tilt.
+  // Mobile / motion-ok: same pinned stack, shrink and tilt as desktop.
   mm.add("(max-width: 900px)", function () {
     if (prefersReducedMotion) return;
     setupPinnedStack(false);
