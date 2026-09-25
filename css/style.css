@@ -333,9 +333,10 @@ footer {
   .cs-device { position: relative; top: auto; left: auto; transform: none; margin: 0 auto; width: min(1000px, 85vw); aspect-ratio: 3 / 4; }
   .cs-card { display: flex; align-items: center; justify-content: center; padding: 60px 0; }
   /* Both phone mockups read too small against the taller mobile card, so
-     they're bumped up on this breakpoint only: lock to 110% of its desktop
-     size (52.7% -> 57.97%), tips to 120% (39.6% -> 47.52%). */
-  .cs-lock-phone { width: 57.97%; }
+     they're bumped up on this breakpoint only: lock to ~133% of its desktop
+     size (52.7% -> 70.15%, after two successive 10% increases from 57.97%),
+     tips to 120% (39.6% -> 47.52%). */
+  .cs-lock-phone { width: 70.15%; }
   .cs-tips-phone { width: 47.52%; }
 }
 
