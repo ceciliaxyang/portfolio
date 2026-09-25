@@ -340,6 +340,10 @@ footer {
      size (52.7% -> 70.15%, after two successive 10% increases from 57.97%),
      tips to 120% (39.6% -> 47.52%). */
   .cs-lock-phone { width: 70.15%; }
+  /* Shadows on all the stacked cards compound into a heavy smudge, so
+     js/main.js adds .no-shadow to every card but the two newest. */
+  .cs-device { transition: box-shadow 0.5s ease; }
+  .cs-device.no-shadow { box-shadow: none; }
   .cs-tips-phone { width: 47.52%; }
 }
 
