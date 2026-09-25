@@ -11,7 +11,7 @@
 <meta property="og:url" content="https://ceciliayang.com/">
 <meta property="og:title" content="Cecilia Yang — Design">
 <meta property="og:description" content="Cecilia is a designer in Oakland, currently leading design teams at Airbnb.">
-<meta property="og:image" content="https://ceciliayang.com/assets/og-image.png">
+<meta property="og:image" content="https://ceciliayang.com/assets/og-image-v2.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Cecilia is a designer in Oakland, currently leading design teams at Airbnb, above a preview of her Airbnb host app work.">
@@ -115,7 +115,12 @@
     </section>
   </div>
 
-  <footer>© 2026</footer>
+  <footer>© <span id="year">2026</span></footer>
+  <script>
+    // Keeps the copyright year current. Inline (not in main.js) so it doesn't
+    // depend on the other scripts loading; the hard-coded 2026 is the fallback.
+    document.getElementById("year").textContent = new Date().getFullYear();
+  </script>
 
   <div class="contact-panel" id="contactPanel">
     <button type="button" class="contact-panel-close" id="contactPanelClose" aria-label="Close">
