@@ -5,6 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cecilia — Design</title>
 <link rel="stylesheet" href="css/style.css">
+<script>
+  // Marks the page as "entrance pending" so the first card starts hidden
+  // (see .js-enter in css/style.css) instead of flashing in before its
+  // entrance animation in js/main.js runs. Skipped for reduced-motion users
+  // and when landing on /contact (including via the 404.html redirect,
+  // which stashes the intended path in sessionStorage). The timeout is a
+  // failsafe: if the main script never runs, the card still appears.
+  (function () {
+    var skip =
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+      location.pathname === "/contact" ||
+      sessionStorage.getItem("redirectPath") === "/contact";
+    if (skip) return;
+    var root = document.documentElement;
+    root.classList.add("js-enter");
+    setTimeout(function () {
+      root.classList.remove("js-enter");
+    }, 4000);
+  })();
+</script>
 </head>
 <body>
 
@@ -16,7 +36,7 @@
 
   <!-- Case study: sticky pinned card stack, cards only -->
   <div class="cs-wrap">
-    <section class="cs-section cs-card cs-pinned">
+    <section class="cs-section cs-card cs-pinned cs-first">
       <div class="cs-device cs-device--today">
         <video class="cs-today-video" src="assets/today-tab.mp4" muted loop playsinline preload="auto"></video>
       </div>

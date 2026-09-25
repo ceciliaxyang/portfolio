@@ -180,6 +180,13 @@ footer {
   will-change: transform;
 }
 
+/* Hidden until the page-load entrance animation (js/main.js) takes over;
+   the class is set by an inline script in <head> and cleared by main.js,
+   or by a timeout there if main.js never runs. */
+.js-enter .cs-first .cs-device {
+  opacity: 0;
+}
+
 /* Card 1 — Today tab screen recording */
 .cs-device--today {
   display: flex;
